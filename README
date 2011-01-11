@@ -9,9 +9,17 @@ It runs the following SQL against the supplied details
 "select count(column_name) from all_tab_columns"
 "select count(index_name) from all_indexes"
 "select count(view_name) from all_views"
+"select value from nls_database_parameters where parameter='NLS_CHARACTERSET'"
 
-then displays the details on a single line.
+then displays the details on a single line. 
 
+EXAMPLE OUTPUT:-
+###############
+
+version.tableCount.columnCount.indexCount.viewCount.characterSet
+"Oracle9i Enterprise Edition Release 9.2.0.4.0 - 64bit Production".553.13764.1078.825."WE8ISO8859P15"
+
+###############
 To run use
 
 Syntax: java -classpath <oracle-driver> -jar DBFingerPrint.jar <JDBC URL> <username> <password>
