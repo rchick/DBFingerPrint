@@ -57,7 +57,8 @@ public class DatabaseFingerPrintGenerator
 		int columnCount = -1;
 		int indexCount = -1;
 		int viewCount = -1;
-
+		String characterSet = "";
+		
 		Connection conn = null;
 		try
 		{
@@ -73,11 +74,12 @@ public class DatabaseFingerPrintGenerator
 
 			viewCount = getViewCount (conn);
 
-			result = version + "." + tableCount + "." + columnCount + "." + indexCount + "."
-			        + viewCount;
-			System.out.println("");
-			System.out.println ("version.tableCount.columnCount.indexCount.viewCount");
-			System.out.println("");
+			characterSet = getCharacterSet(conn);
+			
+			result = "\"" + version + "\"." + tableCount + "." + columnCount + "." + indexCount + "."
+			        + viewCount + ".\"" + characterSet + "\"";
+			
+			System.out.println ("\nversion.tableCount.columnCount.indexCount.viewCount.characterSet");
 			System.out.println (result);
 		}
 		catch (SQLException e)
@@ -262,11 +264,53 @@ public class DatabaseFingerPrintGenerator
 		return totalTableCount;
 	}
 
-//	private void populateTableList(Connection conn)
-//	{
-//		
-//
-//	}
+	private String getCharacterSet(Connection conn)
+	{
+//		long appStart = System.currentTimeMillis ();
+		PreparedStatement statment = null;
+		String characterSet = "";
+		
+		try
+		{
+			statment = conn.prepareStatement ("select value from nls_database_parameters where parameter='NLS_CHARACTERSET'");
+			ResultSet rs = statment.executeQuery ();
+
+			rs.next ();
+			characterSet = rs.getString (1);
+
+			rs.close ();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace ();
+		}
+		finally
+		{
+			try
+			{
+				statment.close ();
+			}
+			catch (SQLException e)
+			{
+				e.printStackTrace ();
+			}
+		}
+
+
+//		long appEnd = System.currentTimeMillis ();
+
+		//System.err.println ("getTableCount (MS) = " + (appEnd - appStart));
+		System.out.print('.');
+		
+		return characterSet;
+	}
+
+	
+	private void populateTableList(Connection conn)
+	{
+		
+
+	}
 
 	private String getMajorVersion(Connection conn)
 	{
@@ -311,6 +355,6 @@ public class DatabaseFingerPrintGenerator
 		String firstWord = major.substring (0, major.indexOf (' '));
 
 		rs.close ();
-		return firstWord;
+		return major;
 	}
 }
