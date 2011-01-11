@@ -4,12 +4,13 @@ Hopefully people will find this Util useful when comparing Oracle environments, 
 
 It runs the following SQL against the supplied details
 
-"select * from v$version"
-"SELECT COUNT(TABLE_NAME) FROM ALL_TABLES"
-"select count(column_name) from all_tab_columns"
-"select count(index_name) from all_indexes"
-"select count(view_name) from all_views"
-"select value from nls_database_parameters where parameter='NLS_CHARACTERSET'"
+Description       - SQL
+Oracle Version    - "select * from v$version"
+Number of Tables  - "SELECT COUNT(TABLE_NAME) FROM ALL_TABLES"
+Number of Columns - "select count(column_name) from all_tab_columns"
+Number of Indexes - "select count(index_name) from all_indexes"
+Number of Views   - "select count(view_name) from all_views"
+DB Character Set  - "select value from nls_database_parameters where parameter='NLS_CHARACTERSET'"
 
 then displays the details on a single line. 
 
@@ -27,11 +28,3 @@ Syntax: java -classpath <oracle-driver> -jar DBFingerPrint.jar <JDBC URL> <usern
    <JDBC URL> db schema full JDBC URL.
    <username> db schema Username.
    <password> db schema Password.
-
-
-
-
-
-
-
-
