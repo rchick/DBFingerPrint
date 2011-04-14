@@ -8,14 +8,18 @@ import java.sql.SQLException;
 
 public class DatabaseFingerPrintGenerator
 {
-	private String getOracleVersion = "select * from v$version";
+	private static final String GET_ORACLE_VERSION = "SELECT * FROM V$VERSION";
+	private static final String GET_ORACLE_CHARACTER_SET = "SELECT VALUE FROM NLS_DATABASE_PARAMETERS WHERE PARAMETER='NLS_CHARACTERSET'";
+	private static final String GET_TABLE_COUNT = "SELECT COUNT(TABLE_NAME) FROM ALL_TABLES";
+	private static final String GET_INDEX_COUNT = "SELECT COUNT(INDEX_NAME) FROM ALL_INDEXES";
+	private static final String GET_VIEW_COUNT = "SELECT COUNT(VIEW_NAME) FROM ALL_VIEWS";
+	private static final String GET_COLUMN_COUNT = "SELECT COUNT(COLUMN_NAME) FROM ALL_TAB_COLUMNS";
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args)
 	{
-		//long appStart = System.currentTimeMillis ();
 		int num = args.length;
 
 		if (num < 3)
@@ -34,9 +38,6 @@ public class DatabaseFingerPrintGenerator
 		DatabaseFingerPrintGenerator dbFingerPrint = new DatabaseFingerPrintGenerator(); 
 		dbFingerPrint.getDatabaseFingerprint (args[0], args[1], args[2]);
 
-		//long appEnd = System.currentTimeMillis ();
-
-		//System.err.println ("TOTAL TIME (MS) = " + (appEnd - appStart));
 		System.out.print('.');
 	}
 
@@ -103,13 +104,11 @@ public class DatabaseFingerPrintGenerator
 
 	private int getViewCount(Connection conn)
 	{
-		//long appStart = System.currentTimeMillis ();
-
 		int totalViewCount = 0;
 		PreparedStatement statment = null;
 		try
 		{
-			statment = conn.prepareStatement ("select count(view_name) from all_views");
+			statment = conn.prepareStatement (DatabaseFingerPrintGenerator.GET_VIEW_COUNT);
 			ResultSet rs = statment.executeQuery ();
 
 			rs.next ();
@@ -134,25 +133,19 @@ public class DatabaseFingerPrintGenerator
 				e.printStackTrace ();
 			}
 		}
-//		long appEnd = System.currentTimeMillis ();
-
-		//System.err.println ("getViewCount (MS) = " + (appEnd - appStart));
 		System.out.print('.');
 
 		return totalViewCount;
-
 	}
 
 	private int getColumnCount(Connection conn)
 	{
-//		long appStart = System.currentTimeMillis ();
-
 		int totalColumnCount = 0;
 		PreparedStatement statment = null;
 
 		try
 		{
-			statment = conn.prepareStatement ("select count(column_name) from all_tab_columns");
+			statment = conn.prepareStatement (DatabaseFingerPrintGenerator.GET_COLUMN_COUNT);
 			ResultSet rs = statment.executeQuery ();
 
 			rs.next ();
@@ -175,9 +168,6 @@ public class DatabaseFingerPrintGenerator
 			e.printStackTrace ();
 		}
 
-//		long appEnd = System.currentTimeMillis ();
-
-		//System.err.println ("getColumnCount (MS) = " + (appEnd - appStart));
 		System.out.print('.');
 
 		return totalColumnCount;
@@ -185,13 +175,11 @@ public class DatabaseFingerPrintGenerator
 
 	private int getIndexCount(Connection conn)
 	{
-//		long appStart = System.currentTimeMillis ();
-
 		int totalIndexCount = 0;
 		PreparedStatement statment = null;
 		try
 		{
-			statment = conn.prepareStatement ("select count(index_name) from all_indexes");
+			statment = conn.prepareStatement (DatabaseFingerPrintGenerator.GET_INDEX_COUNT);
 			ResultSet rs = statment.executeQuery ();
 
 			rs.next ();
@@ -215,9 +203,6 @@ public class DatabaseFingerPrintGenerator
 			}
 		}
 
-//		long appEnd = System.currentTimeMillis ();
-
-		//System.err.println ("getIndexCount (MS) = " + (appEnd - appStart));
 		System.out.print('.');
 
 		return totalIndexCount;
@@ -225,13 +210,12 @@ public class DatabaseFingerPrintGenerator
 
 	private int getTableCount(Connection conn)
 	{
-//		long appStart = System.currentTimeMillis ();
 		PreparedStatement statment = null;
 		int totalTableCount = 0;
 		
 		try
 		{
-			statment = conn.prepareStatement ("SELECT COUNT(TABLE_NAME) FROM ALL_TABLES");
+			statment = conn.prepareStatement (DatabaseFingerPrintGenerator.GET_TABLE_COUNT);
 			ResultSet rs = statment.executeQuery ();
 
 			rs.next ();
@@ -255,10 +239,6 @@ public class DatabaseFingerPrintGenerator
 			}
 		}
 
-
-	//	long appEnd = System.currentTimeMillis ();
-
-		//System.err.println ("getTableCount (MS) = " + (appEnd - appStart));
 		System.out.print('.');
 		
 		return totalTableCount;
@@ -266,13 +246,12 @@ public class DatabaseFingerPrintGenerator
 
 	private String getCharacterSet(Connection conn)
 	{
-//		long appStart = System.currentTimeMillis ();
 		PreparedStatement statment = null;
 		String characterSet = "";
 		
 		try
 		{
-			statment = conn.prepareStatement ("select value from nls_database_parameters where parameter='NLS_CHARACTERSET'");
+			statment = conn.prepareStatement (DatabaseFingerPrintGenerator.GET_ORACLE_CHARACTER_SET);
 			ResultSet rs = statment.executeQuery ();
 
 			rs.next ();
@@ -296,10 +275,6 @@ public class DatabaseFingerPrintGenerator
 			}
 		}
 
-
-//		long appEnd = System.currentTimeMillis ();
-
-		//System.err.println ("getTableCount (MS) = " + (appEnd - appStart));
 		System.out.print('.');
 		
 		return characterSet;
@@ -314,17 +289,12 @@ public class DatabaseFingerPrintGenerator
 
 	private String getMajorVersion(Connection conn)
 	{
-//		long appStart = System.currentTimeMillis ();
-
 		PreparedStatement statment = null;
 		try
 		{
-			statment = conn.prepareStatement (getOracleVersion);
+			statment = conn.prepareStatement (DatabaseFingerPrintGenerator.GET_ORACLE_VERSION);
 			ResultSet rs = statment.executeQuery ();
 
-//			long appEnd = System.currentTimeMillis ();
-
-			//System.err.println ("getMajorVersion (MS) = " + (appEnd - appStart));
 			System.out.print('.');
 			
 			return getVersionResultFromResultSet (rs);
